@@ -7,11 +7,6 @@ from Classlib import *
 
 pygame.init()
 
-#Classes
-
-
-
-
 clock = pygame.time.Clock()
 FPS = 60
 
