@@ -10,7 +10,7 @@ class Bird(pygame.sprite.Sprite):
       
       #Goes through the images to animate the bird
       for num in range(1,4):
-         img = pygame.image.load(f"img/bird{num}.png")
+         img = pygame.image.load(f"img/Bird{num}.png")
          self.images.append(img)
 
       self.image = self.images[self.index]
@@ -26,7 +26,8 @@ class Bird(pygame.sprite.Sprite):
       #main
       self.Flying = Flying
       
-    def update(self):
+      
+    def update(self, game_over):
       #Constantly changes the players y value. Gravity
       if self.Flying == True:
         self.vel += 0.5
@@ -36,24 +37,31 @@ class Bird(pygame.sprite.Sprite):
         if self.rect.bottom < 768:
           self.rect.y += int(self.vel)
 
-      #Flapping
-      if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False: 
-          self.clicked = True
-          self.vel = -10
-      if pygame.mouse.get_pressed()[0] == 0:
-          self.clicked = False
-      
+      if game_over == False:
+        #Flapping
+        if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False: 
+            self.clicked = True
+            self.vel = -10
+        if pygame.mouse.get_pressed()[0] == 0:
+            self.clicked = False
+        
 
-      #handling the animations
-      self.counter += 1
-      flap_cooldown = 5
-      #checks the animation counts to know when to reset
-      if self.counter > flap_cooldown:
-        self.counter = 0
-        self.index += 1
-        if self.index >= len(self.images):
-            self.index = 0
-      self.image = self.images[self.index]
+        #handling the animations
+        self.counter += 1
+        flap_cooldown = 5
+        #checks the animation counts to know when to reset
+        if self.counter > flap_cooldown:
+          self.counter = 0
+          self.index += 1
+          if self.index >= len(self.images):
+              self.index = 0
+        self.image = self.images[self.index]
+
+        #Rotating the bird when space is clicked
+        self.image = pygame.transform.rotate(self.images[self.index], self.vel * -2)
+      else:    
+          #point the bird at the ground
+			    self.image = pygame.transform.rotate(self.images[self.index], -90)
      
 
 

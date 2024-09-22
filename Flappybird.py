@@ -4,6 +4,7 @@ import sys
 from pygame.locals import *
 import random
 from Classlib import *
+from Button import *
 
 pygame.init()
 
@@ -17,7 +18,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT), pygame.RESIZABLE)
 pygame.display.set_caption('Flappy Bird Game')
 bg_image = pygame.image.load("img/bg.png")
 ground = pygame.image.load("img/ground.png")
-
+button_img = pygame.image.load("img/restart.png")
 
 #color
 WHITE = (255,255,255)
@@ -40,8 +41,19 @@ def draw_text(text, font, text_col, x, y):
 	img = font.render(text, True, text_col)
 	screen.blit(img, (x, y))
 
+def reset_game():
+    target_group.empty()
+    pipe_group.empty()
+    bird.rect.x = 100
+    bird.rect.y = int(SCREEN_HEIGHT / 2)
+    scroll_speed = 5
+    score = 0
+    return score
 
 
+
+#create restart button instance
+button = Button(SCREEN_WIDTH // 2 - 50, SCREEN_HEIGHT // 2 - 100, button_img)
 
 #Making a pygame sprite list 
 bullet_group, bird_group, target_group, pipe_group = pygame.sprite.Group(), pygame.sprite.Group(), pygame.sprite.Group(), pygame.sprite.Group()
@@ -64,17 +76,6 @@ while running:
     for sprites in bird_group:
       bird_X,bird_y = sprites.rect.center
       sprites.Flying = Flying
-    
-
-    
-
-    #Shooting the bullets
-    if keys[K_SPACE] == 1 and shoot == True:
-        shoot = False
-        tempbullet = Bullet(bird_X,bird_y, SCREEN_WIDTH)
-        bullet_group.add(tempbullet)
-    if keys[K_SPACE] == 0 and shoot == False:
-       shoot = True
 
     #Drawing and updating stuff on the screen
     screen.blit(bg_image,(0,0))
@@ -91,7 +92,7 @@ while running:
 
     #Drawing the player
     bird_group.draw(screen)
-    bird_group.update()
+    bird_group.update(game_over)
 
     #Draws and scrolls the background
     screen.blit(ground,(ground_scroll,768))
@@ -108,19 +109,24 @@ while running:
           scroll_speed += 1
           pass_pipe = False
     draw_text(str(score), font, WHITE, int(SCREEN_WIDTH / 2), 50)
-    
-    #Event handeling
-    for event in pygame.event.get():
-      if event.type == pygame.QUIT:
-          pygame.quit()
-          sys.exit()
-      if event.type == pygame.MOUSEBUTTONDOWN and Flying == False and game_over == False:
-        Flying = True
-    
   
     #-------------Game Logic (Update game state here)-------------
     if game_over == False and Flying == True:
-      time_now = pygame.time.get_ticks() 
+
+      #Drawing the stuff onto the screen
+      ground_scroll -= scroll_speed  #Varaible to make the ground move
+
+      
+
+      #Shooting the bullets
+      if keys[K_SPACE] == 1 and shoot == True:
+        shoot = False
+        tempbullet = Bullet(bird_X,bird_y, SCREEN_WIDTH)
+        bullet_group.add(tempbullet)
+      if keys[K_SPACE] == 0 and shoot == False:
+       shoot = True
+       
+      time_now = pygame.time.get_ticks()
       if time_now - last_pipe > pipe_frequency:
         #Making the pipes
         pipe_height = random.randint(-100, 100)
@@ -149,21 +155,34 @@ while running:
         btm_pipe.move(btm_pipe.rect.x, btm_pipe.rect.y - (pipe_gap/2))
         top_pipe.move(top_pipe.rect.x, top_pipe.rect.y + (pipe_gap/2))
 
+      #Game over checks
       if pygame.sprite.groupcollide(bird_group, pipe_group, False, False):
         game_over = True
-        Flying = False
+        
 
       if bird.rect.bottom > 768:
         game_over = True
         Flying = False
       
-      #Drawing the stuff onto the screen
-      ground_scroll -= scroll_speed  #Varaible to make the ground move
       
+      
+    if game_over == True:
+        if button.draw(screen):
+          game_over = False
+          score = reset_game()
     
 
-    pygame.display.update()
+
+    #-----------------Event handeling-----------------
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT:
+          running = False
+      if event.type == pygame.MOUSEBUTTONDOWN and Flying == False and game_over == False:
+        Flying = True
     
+    pygame.display.update()
+
+pygame.quit()    
     
 
 
