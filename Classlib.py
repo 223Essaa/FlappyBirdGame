@@ -2,7 +2,7 @@ import pygame
 # from Flappybird import Flying
 
 class Bird(pygame.sprite.Sprite):
-    def __init__(self,x,y, Flying):
+    def __init__(self,x,y, Flying, game_over, SCREEN_HEIGHT):
       super().__init__() #Inherit functionalities
       self.images = []
       self.index = 0
@@ -25,19 +25,20 @@ class Bird(pygame.sprite.Sprite):
 
       #main
       self.Flying = Flying
+      self.game_over = game_over
+      self.SCREEN_HEIGHT = SCREEN_HEIGHT
       
-      
-    def update(self, game_over):
+    def update(self):
       #Constantly changes the players y value. Gravity
       if self.Flying == True:
         self.vel += 0.5
         if self.vel > 8:
           self.vel = 8
         #Prevents the bird from falling through the window 
-        if self.rect.bottom < 768:
+        if self.rect.bottom < self.SCREEN_HEIGHT - 100:
           self.rect.y += int(self.vel)
 
-      if game_over == False:
+      if self.game_over == False:
         #Flapping
         if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False: 
             self.clicked = True
