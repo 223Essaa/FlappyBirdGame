@@ -31,7 +31,10 @@ last_pipe = pygame.time.get_ticks()
 ground_scroll = 0
 scroll_speed = 5
 #Game Checkers
-game_over = pass_pipe = button_hit = Flying = False
+game_over = False
+pass_pipe = False
+button_hit = False
+Flying = False
 score = 0
 bullet = []
 
@@ -47,7 +50,11 @@ def reset_game():
     pipe_group.empty()
     bird.rect.x = 60
     bird.rect.y = int(SCREEN_HEIGHT / 2)
-    #Sets scroll speed to 5 
+    bird.reset_rotation()
+    global scroll_speed, time_now, clock
+    time_now = pygame.time.Clock()
+    time_now = pygame.time.Clock()
+  
     scroll_speed = 5
     score = 0
     return score
@@ -58,7 +65,10 @@ def reset_game():
 button = Button(SCREEN_WIDTH // 2 - 50, SCREEN_HEIGHT // 2 - 100, button_img)
 
 #Making a pygame sprite list 
-bullet_group = bird_group = target_group = pipe_group = pygame.sprite.Group()
+bullet_group = pygame.sprite.Group()
+bird_group = pygame.sprite.Group()
+target_group = pygame.sprite.Group()
+pipe_group = pygame.sprite.Group()
 bird = Bird(60, int(SCREEN_HEIGHT/2), Flying, game_over, SCREEN_HEIGHT)
 bird_group.add(bird)
 
@@ -113,10 +123,7 @@ while running:
 
   #-------------Game Logic (Update game state here)-------------
   if game_over == False and Flying == True:
-
-    #Drawing the stuff onto the screen
-    ground_scroll -= scroll_speed  #Varaible to make the ground move
-
+    
     #Shooting the bullets
     if keys[K_SPACE] == 1 and shoot == True:
       shoot = False
@@ -132,7 +139,7 @@ while running:
       btm_pipe = Pipe(SCREEN_WIDTH, int(SCREEN_HEIGHT/2) + pipe_height, 1, False, scroll_speed)
       top_pipe = Pipe(SCREEN_WIDTH, int(SCREEN_HEIGHT/2) + pipe_height, -1, False, scroll_speed)
       
-      target_height = random.randint(-150, 150)
+      target_height = random.randint(0, 50)
       pipe_target = Target(SCREEN_WIDTH - 30, int(SCREEN_HEIGHT/2) + target_height, scroll_speed)
 
       target_group.add(pipe_target)
@@ -141,10 +148,12 @@ while running:
       last_pipe = time_now
 
 
+
     #Detects if the bullet hits the target to open the pipe up.
     if pygame.sprite.groupcollide(bullet_group, target_group, True, True):
-        btm_pipe.move(btm_pipe.rect.x, btm_pipe.rect.y - (pipe_gap/2))
         top_pipe.move(top_pipe.rect.x, top_pipe.rect.y + (pipe_gap/2))
+        btm_pipe.move(btm_pipe.rect.x, btm_pipe.rect.y - (pipe_gap/2))
+       
     
 
 
@@ -167,6 +176,9 @@ while running:
     if bird.rect.bottom > SCREEN_HEIGHT - 100:
       game_over = True
       Flying = False
+
+    #Varaible to make the ground move
+    ground_scroll -= scroll_speed  
     
     
     
@@ -186,7 +198,3 @@ while running:
   pygame.display.update()
 
 pygame.quit()    
-    
-
-
-

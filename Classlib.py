@@ -2,67 +2,72 @@ import pygame
 # from Flappybird import Flying
 
 class Bird(pygame.sprite.Sprite):
-    def __init__(self,x,y, Flying, game_over, SCREEN_HEIGHT):
-      super().__init__() #Inherit functionalities
-      self.images = []
-      self.index = 0
-      self.counter = 0
-      
-      #Goes through the images to animate the bird
-      for num in range(1,4):
-         img = pygame.image.load(f"img/Bird{num}.png")
-         self.images.append(img)
+  def __init__(self,x,y, Flying, game_over, SCREEN_HEIGHT):
+    super().__init__() #Inherit functionalities
+    self.images = []
+    self.index = 0
+    self.counter = 0
+    
+    #Goes through the images to animate the bird
+    for num in range(1,4):
+        img = pygame.image.load(f"img/Bird{num}.png")
+        self.images.append(img)
 
+    self.image = self.images[self.index]
+    self.rect = self.image.get_rect()
+    self.rect.center = [x,y]
+    self.clicked = False
+    
+    
+    
+    #Gravity
+    self.vel = 0 
+
+    #main
+    self.Flying = Flying
+    self.game_over = game_over
+    self.SCREEN_HEIGHT = SCREEN_HEIGHT
+    
+  def update(self):
+    #Constantly changes the players y value. Gravity
+    if self.Flying == True:
+      self.vel += 0.5
+      if self.vel > 8:
+        self.vel = 8
+      #Prevents the bird from falling through the window 
+      if self.rect.bottom < self.SCREEN_HEIGHT - 100:
+        self.rect.y += int(self.vel)
+
+    if self.game_over == False:
+      #Flapping
+      if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False: 
+          self.clicked = True
+          self.vel = -10
+      if pygame.mouse.get_pressed()[0] == 0:
+          self.clicked = False
+      
+
+      #handling the animations
+      self.counter += 1
+      flap_cooldown = 5
+      #checks the animation counts to know when to reset
+      if self.counter > flap_cooldown:
+        self.counter = 0
+        self.index += 1
+        if self.index >= len(self.images):
+            self.index = 0
       self.image = self.images[self.index]
-      self.rect = self.image.get_rect()
-      self.rect.center = [x,y]
-      self.clicked = False
-     
-      
-      
-      #Gravity
-      self.vel = 0 
 
-      #main
-      self.Flying = Flying
-      self.game_over = game_over
-      self.SCREEN_HEIGHT = SCREEN_HEIGHT
-      
-    def update(self):
-      #Constantly changes the players y value. Gravity
-      if self.Flying == True:
-        self.vel += 0.5
-        if self.vel > 8:
-          self.vel = 8
-        #Prevents the bird from falling through the window 
-        if self.rect.bottom < self.SCREEN_HEIGHT - 100:
-          self.rect.y += int(self.vel)
-
-      if self.game_over == False:
-        #Flapping
-        if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False: 
-            self.clicked = True
-            self.vel = -10
-        if pygame.mouse.get_pressed()[0] == 0:
-            self.clicked = False
+      #Rotating the bird when space is clicked
+      self.image = pygame.transform.rotate(self.images[self.index], self.vel * -2)
+    else:    
+        #point the bird at the ground
+        self.image = pygame.transform.rotate(self.images[self.index], -90)
+                
+  def reset_rotation(self):
+      self.image = pygame.transform.rotate(self.images[self.index], 0)
         
-
-        #handling the animations
-        self.counter += 1
-        flap_cooldown = 5
-        #checks the animation counts to know when to reset
-        if self.counter > flap_cooldown:
-          self.counter = 0
-          self.index += 1
-          if self.index >= len(self.images):
-              self.index = 0
-        self.image = self.images[self.index]
-
-        #Rotating the bird when space is clicked
-        self.image = pygame.transform.rotate(self.images[self.index], self.vel * -2)
-      else:    
-          #point the bird at the ground
-			    self.image = pygame.transform.rotate(self.images[self.index], -90)
+    
      
 
 
