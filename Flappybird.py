@@ -11,7 +11,7 @@ pygame.init()
 clock = pygame.time.Clock()
 FPS = 60
 
-SCREEN_WIDTH = 600
+SCREEN_WIDTH = 700
 SCREEN_HEIGHT = 684
 
 screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
@@ -51,12 +51,10 @@ def reset_game():
     bird.rect.x = 60
     bird.rect.y = int(SCREEN_HEIGHT / 2)
     bird.reset_rotation()
-    global scroll_speed, time_now, clock
-    time_now = pygame.time.Clock()
-    time_now = pygame.time.Clock()
-  
+    global scroll_speed, Flying
     scroll_speed = 5
     score = 0
+    Flying = False
     return score
 
 
@@ -64,12 +62,14 @@ def reset_game():
 #create restart button instance
 button = Button(SCREEN_WIDTH // 2 - 50, SCREEN_HEIGHT // 2 - 100, button_img)
 
+keys = pygame.key.get_pressed()
+
 #Making a pygame sprite list 
 bullet_group = pygame.sprite.Group()
 bird_group = pygame.sprite.Group()
 target_group = pygame.sprite.Group()
 pipe_group = pygame.sprite.Group()
-bird = Bird(60, int(SCREEN_HEIGHT/2), Flying, game_over, SCREEN_HEIGHT)
+bird = Bird(60, int(SCREEN_HEIGHT/2), Flying, game_over, SCREEN_HEIGHT, keys)
 bird_group.add(bird)
 
 
@@ -86,6 +86,7 @@ while running:
     bird_X,bird_y = sprites.rect.center
     sprites.Flying = Flying
     sprites.game_over = game_over
+    sprites.keys = keys
 
 
   #Drawing and updating stuff on the screen
@@ -125,11 +126,11 @@ while running:
   if game_over == False and Flying == True:
     
     #Shooting the bullets
-    if keys[K_SPACE] == 1 and shoot == True:
+    if keys[K_d] == 1 and shoot == True:
       shoot = False
       tempbullet = Bullet(bird_X,bird_y, SCREEN_WIDTH)
       bullet_group.add(tempbullet)
-    if keys[K_SPACE] == 0 and shoot == False:
+    if keys[K_d] == 0 and shoot == False:
       shoot = True
     
     time_now = pygame.time.get_ticks()
@@ -139,8 +140,8 @@ while running:
       btm_pipe = Pipe(SCREEN_WIDTH, int(SCREEN_HEIGHT/2) + pipe_height, 1, False, scroll_speed)
       top_pipe = Pipe(SCREEN_WIDTH, int(SCREEN_HEIGHT/2) + pipe_height, -1, False, scroll_speed)
       
-      target_height = random.randint(0, 50)
-      pipe_target = Target(SCREEN_WIDTH - 30, int(SCREEN_HEIGHT/2) + target_height, scroll_speed)
+      target_height = random.randint(-50, 50)
+      pipe_target = Target(SCREEN_WIDTH - 50, int(SCREEN_HEIGHT/2) + target_height, scroll_speed)
 
       target_group.add(pipe_target)
       pipe_group.add(btm_pipe)
@@ -173,7 +174,7 @@ while running:
       game_over = True
       
 
-    if bird.rect.bottom > SCREEN_HEIGHT - 100:
+    if bird.rect.bottom > SCREEN_HEIGHT - 110:
       game_over = True
       Flying = False
 
@@ -193,8 +194,9 @@ while running:
   for event in pygame.event.get():
     if event.type == pygame.QUIT:
         running = False
-    if event.type == pygame.MOUSEBUTTONDOWN and Flying == False and game_over == False:
-      Flying = True
+    if event.type == pygame.KEYDOWN and Flying == False and game_over == False:
+      if event.key == pygame.K_w:
+        Flying = True
   pygame.display.update()
 
 pygame.quit()    
