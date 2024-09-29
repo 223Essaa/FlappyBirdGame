@@ -122,9 +122,9 @@ class Bullet(pygame.sprite.Sprite):
           self.kill()
 
 class Target(pygame.sprite.Sprite):
-    def __init__(self, x, y, scroll_speed):
+    def __init__(self, x, y, scroll_speed, img):
        super().__init__()
-       self.image = pygame.image.load("img/Target.png")
+       self.image = img
        self.rect = self.image.get_rect()
        self.rect.center = [x,y]
 

@@ -20,6 +20,8 @@ bg_image = pygame.image.load("img/bg.png")
 bg_image = pygame.transform.scale(bg_image,(SCREEN_WIDTH, SCREEN_HEIGHT))
 ground = pygame.image.load("img/ground.png")
 button_img = pygame.image.load("img/restart.png")
+target_img = pygame.image.load("img/Target.png")
+target_img = pygame.transform.scale(target_img,(80,80))
 
 #color
 WHITE = (255,255,255)
@@ -141,9 +143,9 @@ while running:
       top_pipe = Pipe(SCREEN_WIDTH, int(SCREEN_HEIGHT/2) + pipe_height, -1, False, scroll_speed)
       
       target_height = random.randint(-50, 50)
-      pipe_target = Target(SCREEN_WIDTH - 50, int(SCREEN_HEIGHT/2) + target_height, scroll_speed)
+      target = Target(SCREEN_WIDTH - 50, int(SCREEN_HEIGHT/2) + target_height, scroll_speed, target_img)
 
-      target_group.add(pipe_target)
+      target_group.add(target)
       pipe_group.add(btm_pipe)
       pipe_group.add(top_pipe)
       last_pipe = time_now
